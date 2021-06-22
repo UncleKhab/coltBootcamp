@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forms</title>
+  </head>
+  <body>
+    <h1>Forms</h1>
+
+    <h2>Hijack Searches</h2>
+
+    <h3>Search Reddit</h3>
+    <form action="http://reddit.com/search/" target="_blank">
+      <input type="text" name="q" id="SB" />
+      <input type="submit" value="Search Reddit" />
+    </form>
+    <h3>Search Google</h3>
+    <form action="http://google.com/search">
+      <input type="text" name="q" />
+      <input type="submit" value="Search Google" />
+    </form>
+    <h3>Search Youtube</h3>
+    <form action="https://youtube.com/results">
+      <input type="text" name="search_query" />
+      <input type="submit" value="Search Youtube" />
+    </form>
+
+    <h3>More Inputs!</h3>
+    <form action="/firebir">
+      <input type="checkbox" name="agree_tos" id="agree" />
+      <label for="agree">I agree!</label>
+      <input type="submit" value="Send it" />
+    </form>
+
+    <h3>Radio Buttons</h3>
+    <form action="/radios">
+      <p>
+        <label for="xs">XS:</label>
+        <input type="radio" name="size" id="xs" value="xs" />
+        <label for="s">S:</label>
+        <input type="radio" name="size" id="s" value="s" />
+        <label for="m">M:</label>
+        <input type="radio" name="size" id="m" value="m" />
+      </p>
+      <input type="submit" value="sendit" />
+    </form>
+
+    <h3>Select</h3>
+    <form action="/selection">
+      <select name="meal" id="meal">
+        <option value="fish">Fisk</option>
+        <option value="steak">Steak</option>
+        <option value="Veggie">Veggie</option>
+        <option value="potatoes">Potatoes</option>
+        <option value="chicken"></option>
+      </select>
+    </form>
+  </body>
+</html>

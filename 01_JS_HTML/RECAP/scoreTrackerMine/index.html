@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Score Tracker</title>
+  </head>
+  <body>
+    <main>
+      <div class="hero">
+        <img
+          src="https://images.unsplash.com/photo-1585591424436-a55926755d91?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
+          alt="pingpong"
+          class="hero-image"
+        />
+        <h3 class="hero-title">Ping Pong Score Keeper</h3>
+      </div>
+      <div class="dashboard">
+        <h1 id="score">0 to 0</h1>
+        <p>Use the buttons below to keep score</p>
+        <p>
+          <label for="upTo">Playing to</label>
+          <select name="upTo" id="upTo">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7" selected>7</option>
+          </select>
+        </p>
+      </div>
+      <div class="buttons">
+        <button class="playerOne" data-value="playerOne">+1 Player One</button>
+        <button class="playerTwo" data-value="playerTwo">+1 Player Two</button>
+        <button class="resetScore" data-value="resetScore">Reset</button>
+      </div>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

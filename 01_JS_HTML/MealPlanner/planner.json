@@ -1,0 +1,57 @@
+[{
+    "name": "Pork Chops",
+    "link":"https://easyfamilyrecipes.com/million-dollar-pork-chops/ ", 
+    "course": "dinner",
+    "category": ["want-to-cook", "easy-to-make"],
+    "ingredients":"",    
+},
+{
+    "name":"Chicken Tinga",
+    "link":"https://easyfamilyrecipes.com/crockpot-chicken-tinga/",
+    "course": "dinner",
+    "category": ["want-to-cook", "easy-to-make"],
+    "ingredients":,
+}
+,
+{
+    "name":"Chicken Caesar Pasta Salad",
+    "link":"https://easyfamilyrecipes.com/chicken-caesar-pasta-salad/",
+    "course":"dinner",
+    "category":["easy-to-make"],
+    "ingredients":"",
+},
+{
+    "name":"Ham and Cheese Breakfast Casserole",
+    "link":"https://easyfamilyrecipes.com/ham-and-cheese-breakfast-casserole/",
+    "course":"breakfast",
+    "category":["easy-to-make", "multiple-days"],
+    "ingredients":"",
+},
+{
+    "name":"Apple Cinnamon Muffin",
+    "link":"https://easyfamilyrecipes.com/apple-cinnamon-muffins/",
+    "course":"breakfast",
+    "category":[],
+    "ingredients":"",
+},
+{
+    "name":"Meat Balls",
+    "link":"https://www.gimmesomeoven.com/meatball-recipe/",
+    "course":"dinner",
+    "category":["time-consuming", "leftovers"],
+    "ingredients":"",
+},
+{
+    "name": "Magic Cookie Bars",
+    "link": "https://lilluna.com/magic-cookie-bars/",
+    "course": "desert",
+    "category":[],
+    "ingredients":"",
+},
+{
+    "name": "Broccoli Cauliflower Salad",
+    "link": "https://easyfamilyrecipes.com/broccoli-cauliflower-salad/",
+    "course": "lunch",
+    "category":[],
+    "ingredients":"",
+}]
