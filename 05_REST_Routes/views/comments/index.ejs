@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<body>
+    <%- include('../partials/navbar') %>
+    <div class="container-fluid">
+        <h1>Comments Index</h1>
+        <ul class="list-unstyled">
+            <% for(let item of comments) {%>
+                <li><%= item.comment %> -- 
+                    <b><%= item.username %></b> 
+                    <a href="/comments/<%= item.id %>">Details</a>
+                </li>
+            <%}%>
+        </ul>
+
+        <a href="comments/new" class="btn btn-primary">Add Comment</a>
+    </div>
+</body>
+</html>

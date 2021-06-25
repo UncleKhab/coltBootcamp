@@ -1,0 +1,10 @@
+<%- include('../partials/header') %>
+<body>
+    <%- include('../partials/navbar') %>
+    <div class="container-fluid">
+       <h3>Comment id: # <%= comment.id %></h3>
+       <h4><%= comment.comment %> - <%= comment.username %></h4>
+       <a href="/comments" class="btn btn-primary">back</a>
+    </div>
+</body>
+</html>

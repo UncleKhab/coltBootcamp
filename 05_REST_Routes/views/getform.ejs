@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+<body>
+  <%- include('partials/navbar') %>
+  <div class="container-fluid">
+    <h1>Get and Posts</h1>
+    <h2>GET</h2>
+    <form action="/tacos" method="GET">
+      <input type="text" name="meat" />
+      <input type="number" name="qty" />
+      <button>Submit</button>
+    </form>
+    <h2>POST</h2>
+    <form action="/tacos" method="POST">
+      <input type="text" name="meat" />
+      <input type="number" name="qty" />
+      <button>Submit</button>
+    </form>
+  </div>
+</body>
