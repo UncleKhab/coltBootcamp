@@ -1,0 +1,12 @@
+.text-c {
+    text-align:center;
+}
+.text-r{
+    text-align:right;
+}
+.text-b{
+    font-weight:bold;
+}
+.list-item-container p{
+    margin:0;
+}

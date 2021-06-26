@@ -1,0 +1,77 @@
+<%- include('../partials/header') %>
+    <div class="container-fluid">
+        <h1 class="text-c">Here is your grocery list</h1>
+        <ul class="list-group">
+            <% for(let grocery of groceries){ %>
+                <li class="list-group-item" data-id="<%= grocery.id %>">
+                    <div class="list-item-container row" >
+                        <div class="list-item col-9">
+                                <div class="row">
+                                    <p class="col-11 text-b"><%= grocery.name %></p>
+                                    <p class="col-1 text-r"><%= grocery.qty %></p>
+                                </div>
+                            </div>
+                        <div class="list-buttons col-3 text-r ">
+                            <a data-id="<%= grocery.id %>" class="edit btn btn-success btn-sm" href="#" role="button">Edit</a>
+                            <form method="POST" class="d-inline" action="/groceries/<%= grocery.id %>?_method=DELETE">
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                       
+                        </div>
+                    </div>
+                </li>
+            <%}%>
+            <li class="list-group-item">
+                <form  method="POST" action="/groceries">
+                    <div class="row">
+                        <button class="btn btn-primary btn-sm col-1">Add</button>
+                        <input class="form-control col-9" type="text" name="name" placeholder="Add a new Grocery">
+                        <input class="form-control col-2" type="text" name="qty" placeholder="Quantity">
+                    </div>
+                    
+                </form>
+            </li>
+        </ul>
+    </div>
+    <script>
+        const handleElements = (e) => {
+            const {id} = e.target.dataset;
+            const listItem = document.querySelector(`li[data-id='${id}']`);
+            const oldHTML = listItem.innerHTML;
+            console.log(listItem);
+            fetch(`/groceries/${id}`)
+                .then(response => response.json())
+                .then(result => 
+                {
+                    const {name, qty } = result;
+                    console.log(name, qty);
+                    const newHTML = `
+                                        <form  method="POST" action="/groceries/${id}?_method=PATCH">
+                                            <div class="row">
+                                                <input class="form-control col-8" type="text" name="name" value="${name}" placeholder="Edit The Grocery">
+                                                <input class="form-control col-2" type="text" name="qty"  value="${qty}" placeholder="Quantity">
+                                                <button class="btn btn-primary btn-sm col-1">Edit</button>
+                                                <button class="btn btn-success btn-sm col-1" id="btn-cancel">Cancel</button>
+                                            </div>
+                                        </form>
+                                    `
+                    listItem.innerHTML = newHTML;
+                })
+                .then(() => {
+                    document.querySelector('#btn-cancel').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        listItem.innerHTML = oldHTML;
+                        const editBtn = document.querySelector(`.edit[data-id='${id}'`);
+                        editBtn.addEventListener('click', handleElements);
+                    })
+                })
+            
+            
+        }
+        const editButtons = document.querySelectorAll('.edit');
+        editButtons.forEach(item => item.addEventListener('click', handleElements))
+        
+        
+    </script>
+    </body>
+</html>
