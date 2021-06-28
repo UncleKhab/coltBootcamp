@@ -47,65 +47,81 @@ app.get("/products/new", (req, res) => {
 });
 
 // Create the new product
-app.post("/products", async (req, res, next) => {
-  try {
+app.post(
+  "/products",
+  wrapAsync(async (req, res, next) => {
     const newProduct = new Product(req.body);
     await newProduct.save();
     res.redirect(`products/${newProduct._id}`);
-  } catch (e) {
-    next(e);
-  }
-});
-
+  })
+);
+function wrapAsync(fn) {
+  return function (req, res, next) {
+    fn(req, res, next).catch((e) => next(e));
+  };
+}
 // DETAILED
-app.get("/products/:id", async (req, res, next) => {
-  try {
+app.get(
+  "/products/:id",
+  wrapAsync(async (req, res, next) => {
     const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new AppError("Id doesn't match", 403);
+    }
     const product = await Product.findById(id);
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
     res.render("products/show", { product });
-  } catch (e) {
-    next(e);
-  }
-});
+  })
+);
 
 // Serve Editing Form
-app.get("/products/:id/edit", async (req, res, next) => {
-  try {
+app.get(
+  "/products/:id/edit",
+  wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findById(id);
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
     res.render("products/edit", { product, categories });
-  } catch (e) {
-    next(e);
-  }
-});
+  })
+);
 
 // Updating
-app.put("/products/:id", async (req, res, next) => {
-  try {
+app.put(
+  "/products/:id",
+  wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndUpdate(id, req.body, {
       runValidators: true,
       new: true,
     });
     res.redirect(`/products/${product._id}`);
-  } catch (e) {
-    next(e);
-  }
-});
+  })
+);
 
 //Delete
-app.delete("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const deletedProduct = await Product.findByIdAndDelete(id);
-  res.redirect("/products");
-});
+app.delete(
+  "/products/:id",
+  wrapAsync(async (req, res) => {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id);
+    res.redirect("/products");
+  })
+);
 
+const handleValidationErr = (err) => {
+  console.dir(err);
+  return new AppError(`Validation Failed...${err.message}`, 400);
+};
+app.use((err, req, res, next) => {
+  console.log(err.name);
+  if (err.name === "ValidationError") err = handleValidationErr(err);
+  if (err.name === "CastError") err = handleValidationErr(err);
+  next(err);
+});
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong" } = err;
   res.status(status).send(message);
