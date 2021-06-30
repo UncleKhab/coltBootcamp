@@ -3,11 +3,12 @@ const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 const Joi = require("joi");
-const { campgroundSchema } = require("./schemas.js");
+const { campgroundSchema, reviewSchema } = require("./schemas.js");
 const catchAsync = require("./utilities/catchAsync");
 const ExpressError = require("./utilities/ExpressError");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground");
+const Review = require("./models/review");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
@@ -31,8 +32,24 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+// Validation Function for Campground,
+// it uses a JOI schema defined in the schemas.js
+// It's used as middleware(it will run before the request execution)
+// It will see if all the data(specified in the JOI schema is there)
+// It will throw an error if it finds something wrong
+// Otherwise it will continue with the rest of the execution.
 const validateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
+  if (error) {
+    const messageError = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(messageError, 400);
+  } else {
+    next();
+  }
+};
+
+const validateReview = (req, res, next) => {
+  const { error } = reviewSchema.validate(req.body);
   if (error) {
     const messageError = error.details.map((el) => el.message).join(",");
     throw new ExpressError(messageError, 400);
@@ -57,6 +74,7 @@ app.get("/campgrounds/new", (req, res) => {
   res.render("campgrounds/new");
 });
 // Post Route for campground
+// We use validateCamground which uses a JOI schema to validate our post data
 app.post(
   "/campgrounds",
   validateCampground,
@@ -75,13 +93,14 @@ app.get(
   "/campgrounds/:id",
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id);
+    const campground = await Campground.findById(id).populate("reviews");
+
     if (!campground) throw new ExpressError("Id doesn't match anything", 400);
-    console.log(campground);
+
     res.render("campgrounds/show", { campground });
   })
 );
-
+// get the edit form
 app.get(
   "/campgrounds/:id/edit",
   catchAsync(async (req, res, next) => {
@@ -90,6 +109,7 @@ app.get(
     res.render("campgrounds/edit", { campground });
   })
 );
+// Send The Edit
 app.put(
   "/campgrounds/:id",
   validateCampground,
@@ -101,12 +121,37 @@ app.put(
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
+// Delete The Campground
 app.delete(
   "/campgrounds/:id",
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect("/campgrounds");
+  })
+);
+
+app.post(
+  "/campgrounds/:id/reviews",
+  validateReview,
+  catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+  })
+);
+app.delete(
+  "/campgrounds/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, {
+      $pull: { reviews: reviewId },
+    });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
   })
 );
 app.all("*", (req, res, next) => {
