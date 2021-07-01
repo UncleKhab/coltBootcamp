@@ -8,6 +8,9 @@ app.use("/shelters", shelterRoutes);
 app.use("/dogs", dogsRoutes);
 app.use("/admin", adminRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Homepage");
+});
 app.listen("3000", () => {
   console.log("Serving App On localhost:3000");
 });
