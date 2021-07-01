@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const catchAsync = require("../utilities/catchAsync");
+const { campgroundSchema } = require("../schemas");
+const { isLoggedIn } = require("../middleware");
 const ExpressError = require("../utilities/ExpressError");
 const Campground = require("../models/campground");
-const { campgroundSchema } = require("../schemas");
 
 // Validation Function for Campground,
 // it uses a JOI schema defined in the schemas.js
@@ -29,7 +30,7 @@ router.get(
   })
 );
 // Serve the new form
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("campgrounds/new");
 });
 // Post Route for campground
@@ -66,6 +67,7 @@ router.get(
 // get the edit form
 router.get(
   "/:id/edit",
+  isLoggedIn,
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
@@ -80,6 +82,7 @@ router.get(
 // Send The Edit
 router.put(
   "/:id",
+  isLoggedIn,
   validateCampground,
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
@@ -93,6 +96,7 @@ router.put(
 // Delete The Campground
 router.delete(
   "/:id",
+  isLoggedIn,
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
