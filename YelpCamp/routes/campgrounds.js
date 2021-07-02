@@ -1,108 +1,48 @@
 const express = require("express");
 const router = express.Router();
+const campgrounds = require("../controllers/campgrounds");
 const catchAsync = require("../utilities/catchAsync");
-const { campgroundSchema } = require("../schemas");
-const { isLoggedIn } = require("../middleware");
-const ExpressError = require("../utilities/ExpressError");
-const Campground = require("../models/campground");
+const { isLoggedIn, validateCampground, isAuthor } = require("../middleware");
+const multer = require("multer");
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 
-// Validation Function for Campground,
-// it uses a JOI schema defined in the schemas.js
-// It's used as middleware(it will run before the request execution)
-// It will see if all the data(specified in the JOI schema is there)
-// It will throw an error if it finds something wrong
-// Otherwise it will continue with the rest of the execution.
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  if (error) {
-    const messageError = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(messageError, 400);
-  } else {
-    next();
-  }
-};
+router
+  .route("/")
+  .get(catchAsync(campgrounds.index))
+  // Post Route for campground
+  // We use validateCamground which uses a JOI schema to validate our post data
+  .post(
+    isLoggedIn,
+    upload.array("image"),
+    validateCampground,
+    catchAsync(campgrounds.createNewCampground)
+  );
+// .post(upload.array("image"), (req, res) => {
+//   console.log(req.body, req.files);
+//   res.send(req.body);
+// });
 
-router.get(
-  "/",
-  catchAsync(async (req, res, next) => {
-    const campgrounds = await Campground.find({});
-    res.render("campgrounds/index", { campgrounds });
-  })
-);
 // Serve the new form
-router.get("/new", isLoggedIn, (req, res) => {
-  res.render("campgrounds/new");
-});
-// Post Route for campground
-// We use validateCamground which uses a JOI schema to validate our post data
-router.post(
-  "/",
-  validateCampground,
-  catchAsync(async (req, res, next) => {
-    // if (!req.body.campground)
-    //   throw new ExpressError("Invalid Campground Data", 400);
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    req.flash("success", "Succesfully made a new campground!");
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
-
-// detailed view
-router.get(
-  "/:id",
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id).populate("reviews");
-
-    if (!campground) {
-      req.flash("error", "Cannot find that campground!");
-      return res.redirect("/campgrounds");
-      // throw new ExpressError("Id doesn't match anything", 400);
-    }
-
-    res.render("campgrounds/show", { campground });
-  })
-);
+router.get("/new", isLoggedIn, campgrounds.renderNewForm);
+router
+  .route("/:id")
+  .get(catchAsync(campgrounds.showCampground))
+  .put(
+    isLoggedIn,
+    isAuthor,
+    upload.array("image"),
+    validateCampground,
+    catchAsync(campgrounds.updateCampground)
+  )
+  .delete(isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground));
 // get the edit form
 router.get(
   "/:id/edit",
   isLoggedIn,
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id);
-    if (!campground) {
-      req.flash("error", "Cannot find that campground!");
-      return res.redirect("/campgrounds");
-      // throw new ExpressError("Id doesn't match anything", 400);
-    }
-    res.render("campgrounds/edit", { campground });
-  })
+  isAuthor,
+  catchAsync(campgrounds.renderEditForm)
 );
 // Send The Edit
-router.put(
-  "/:id",
-  isLoggedIn,
-  validateCampground,
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, {
-      ...req.body.campground,
-    });
-    req.flash("success", "Successfully updated campground!");
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
-// Delete The Campground
-router.delete(
-  "/:id",
-  isLoggedIn,
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    req.flash("success", "Succesfully deleted campground!");
-    res.redirect("/campgrounds");
-  })
-);
 
 module.exports = router;
