@@ -22,7 +22,9 @@ const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
+const MongoDBStore = require("connect-mongo");
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -36,13 +38,25 @@ db.once("open", () => {
 });
 
 const app = express();
-
+const secret = process.env.SECRET || "developmentbackupsecret";
 // SESSION SETUP
+const store = MongoDBStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret,
+  },
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
 const sessionConfig = {
   name: "sesh",
-  secret: "thisshouldbeabettersecret!",
+  secret,
   resave: false,
   saveUninitialized: true,
+  store,
   cookie: {
     httpOnly: true,
     //secure:true,
@@ -103,7 +117,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Middleware
-app.use(mongoSanitize());
+app.use(mongoSanitize({ replaceWith: "_" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
